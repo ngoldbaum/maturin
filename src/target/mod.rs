@@ -15,7 +15,7 @@ use std::process::Command;
 use std::str;
 use std::str::FromStr;
 use target_lexicon::{Architecture, Environment, Triple};
-use tracing::error;
+use tracing::{debug, error};
 
 mod legacy_py;
 mod pypi_tags;
@@ -344,11 +344,16 @@ impl Target {
         let machine = PlatformInfo::new().map(|info| info.machine().to_string_lossy().into_owned());
         let arch = match machine {
             Ok(machine) => {
+                debug!(
+                    "machine inferred from PlatformInfo for arch {}: {}",
+                    self.arch, machine
+                );
                 let linux32 = (machine == "x86_64" && self.arch != Arch::X86_64)
                     || (machine == "aarch64" && self.arch != Arch::Aarch64);
                 if linux32 {
                     // When running in Docker sometimes uname returns 64-bit architecture while the container is actually 32-bit,
                     // In this case we trust the architecture of rustc target
+                    debug!("hit linux32 workaround");
                     self.arch.to_string()
                 } else {
                     machine
