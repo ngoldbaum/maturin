@@ -32,7 +32,7 @@ use std::env;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use tracing::instrument;
+use tracing::{debug, instrument};
 
 /// Insert wasm launcher scripts as entrypoints and the wasmtime dependency
 fn bin_wasi_helper(
@@ -581,6 +581,11 @@ impl BuildContext {
         }
 
         let target = &self.target;
+        debug!(
+            "Calculating tag for target OS {} and arch {}",
+            &target.target_os(),
+            &target.target_arch()
+        );
         let tag = match (&target.target_os(), &target.target_arch()) {
             // Windows
             (Os::Windows, Arch::X86) => "win32".to_string(),
@@ -683,6 +688,7 @@ impl BuildContext {
                 )
             }
         };
+        debug!("Calculated tag: {}", tag);
         Ok(tag)
     }
 
