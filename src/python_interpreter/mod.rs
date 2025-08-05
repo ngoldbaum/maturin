@@ -547,6 +547,7 @@ impl PythonInterpreter {
                 }
             }
         };
+        debug!("Inferred tag: {}", tag);
         Ok(tag)
     }
 
